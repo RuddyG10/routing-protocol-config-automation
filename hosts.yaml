@@ -1,0 +1,12 @@
+R1:
+  hostname: 192.168.100.121
+  password: osiris1431
+  platform: cisco_ios_telnet
+  port: 33313
+  username: mabc0002
+R2:
+  hostname: 192.168.100.121
+  password: Ruddy2002
+  platform: cisco_ios_telnet
+  port: 33318
+  username: rggt0001

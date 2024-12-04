@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-center mb-4">Asignar Protocolo</h1>
+<h3 class="text-center">Dispositivo: {{ device.name }}</h3>
+<form method="POST" action="{{ url_for('configure_protocol', device_id=device.id) }}">
+    <div class="mb-3">
+        <label for="protocol" class="form-label">Protocolo de Enrutamiento</label>
+        <select class="form-select" id="protocol" name="protocol" required>
+            <option value="RIP">RIPv2</option>
+            <option value="EIGRP">EIGRP</option>
+            <option value="OSPF">OSPF</option>
+            <option value="BGP">BGP</option>
+        </select>
+    </div>
+    <div id="protocol-options">
+        <!-- Configuración dinámica según el protocolo -->
+        <div id="RIP" class="protocol-config d-none">
+            <div id="rip-networks">
+                <div class="network-group">
+                    <label for="rip_network_0" class="form-label">Red</label>
+                    <input type="text" class="form-control" id="rip_network_0" name="rip_networks[]" placeholder="192.168.1.0/24">
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary mt-2" onclick="addNetwork('rip-networks', 'rip_networks[]')">Agregar Red</button>
+        </div>
+        <div id="EIGRP" class="protocol-config d-none">
+            <label for="eigrp_as_number" class="form-label">Número de AS</label>
+            <input type="text" class="form-control" id="eigrp_as_number" name="eigrp_as_number" placeholder="100">
+            <div id="eigrp-networks">
+                <div class="network-group">
+                    <label for="eigrp_network_0" class="form-label">Red</label>
+                    <input type="text" class="form-control" id="eigrp_network_0" name="eigrp_networks[]" placeholder="192.168.1.0/24">
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary mt-2" onclick="addNetwork('eigrp-networks', 'eigrp_networks[]')">Agregar Red</button>
+        </div>
+        <div id="OSPF" class="protocol-config d-none">
+            <label for="process_id" class="form-label">ID de Proceso</label>
+            <input type="text" class="form-control" id="process_id" name="process_id" placeholder="1" required>
+            <div id="ospf-networks">
+                <div class="network-group">
+                    <label for="ospf_network_0" class="form-label">Red</label>
+                    <input type="text" class="form-control" id="ospf_network_0" name="ospf_networks[]" placeholder="192.168.1.0">
+                    <label for="ospf_wildcard_0" class="form-label mt-2">Wildcard Mask</label>
+                    <input type="text" class="form-control" id="ospf_wildcard_0" name="ospf_wildcards[]" placeholder="0.0.0.255">
+                    <label for="ospf_area_0" class="form-label mt-2">Área</label>
+                    <input type="text" class="form-control" id="ospf_area_0" name="ospf_areas[]" placeholder="0">
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary mt-2" onclick="addNetwork('ospf-networks', ['ospf_networks[]', 'ospf_wildcards[]', 'ospf_areas[]'])">Agregar Red</button>
+        </div>
+        <div id="BGP" class="protocol-config d-none">
+            <label for="bgp_as_number" class="form-label">Número de AS</label>
+            <input type="text" class="form-control" id="bgp_as_number" name="bgp_as_number" placeholder="65001">
+            <div id="bgp-networks">
+                <div class="network-group">
+                    <label for="bgp_network_0" class="form-label">Red</label>
+                    <input type="text" class="form-control" id="bgp_network_0" name="bgp_networks[]" placeholder="192.168.1.0/24">
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary mt-2" onclick="addNetwork('bgp-networks', 'bgp_networks[]')">Agregar Red</button>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success mt-3">Asignar Protocolo</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Cancelar</a>
+</form>
+
+<script>
+    document.getElementById('protocol').addEventListener('change', function () {
+        document.querySelectorAll('.protocol-config').forEach(el => {
+            el.classList.add('d-none');
+            el.querySelectorAll('input, select').forEach(input => input.removeAttribute('required'));
+        });
+
+        const selectedProtocol = document.getElementById(this.value);
+        if (selectedProtocol) {
+            selectedProtocol.classList.remove('d-none');
+            selectedProtocol.querySelectorAll('input, select').forEach(input => input.setAttribute('required', 'true'));
+        }
+    });
+
+    document.querySelector('form').addEventListener('submit', function (event) {
+        document.querySelectorAll('.protocol-config.d-none input, .protocol-config.d-none select').forEach(input => {
+            input.removeAttribute('required');
+        });
+
+        if (!this.checkValidity()) {
+            event.preventDefault();
+        }
+    });
+
+    // Agrega un nuevo campo de red dinámicamente
+    function addNetwork(containerId, fieldNames) {
+        const container = document.getElementById(containerId);
+        const index = container.children.length;
+        const group = document.createElement('div');
+        group.classList.add('network-group', 'mt-3');
+
+        if (Array.isArray(fieldNames)) {
+            fieldNames.forEach((fieldName, i) => {
+                const label = document.createElement('label');
+                label.setAttribute('for', `${fieldName}_${index}`);
+                label.classList.add('form-label');
+                label.textContent = i === 0 ? 'Network' : i === 1 ? 'Wildcard Mask' : 'Area';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.classList.add('form-control');
+                input.id = `${fieldName}_${index}`;
+                input.name = fieldName;
+                input.placeholder = i === 0 ? '192.168.1.0' : i === 1 ? '0.0.0.255' : '0';
+
+                group.appendChild(label);
+                group.appendChild(input);
+            });
+        } else {
+            const label = document.createElement('label');
+            label.setAttribute('for', `${fieldNames}_${index}`);
+            label.classList.add('form-label');
+            label.textContent = 'Network';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.classList.add('form-control');
+            input.id = `${fieldNames}_${index}`;
+            input.name = fieldNames;
+            input.placeholder = '192.168.1.0/24';
+
+            group.appendChild(label);
+            group.appendChild(input);
+        }
+
+        container.appendChild(group);
+    }
+</script>
+{% endblock %}

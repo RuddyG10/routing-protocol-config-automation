@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-center mb-4">Edit Device</h1>
+<form method="POST" action="{{ url_for('edit_device', device_id=device.id) }}">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ device.name }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="hostname" class="form-label">Hostname</label>
+        <input type="text" class="form-control" id="hostname" name="hostname" value="{{ device.hostname }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="model" class="form-label">Model</label>
+        <input type="text" class="form-control" id="model" name="model" value="{{ device.model }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="brand" class="form-label">Brand</label>
+        <input type="text" class="form-control" id="brand" name="brand" value="{{ device.brand }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="connection_port" class="form-label">Connection Port</label>
+        <input type="number" class="form-control" id="connection_port" name="connection_port" value="{{ device.connection_port }}">
+    </div>
+    <div class="mb-3">
+        <label for="protocol" class="form-label">Protocol</label>
+        <select class="form-select" id="protocol" name="protocol">
+            <option value="SSH" {% if device.protocol == 'SSH' %}selected{% endif %}>SSH</option>
+            <option value="Telnet" {% if device.protocol == 'Telnet' %}selected{% endif %}>Telnet</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="platform" class="form-label">Platform</label>
+        <select class="form-select" id="platform" name="platform">
+            <option value="ios" {% if device.platform == 'ios' %}selected{% endif %}>IOS</option>
+            <option value="junos" {% if device.platform == 'junos' %}selected{% endif %}>JunOS</option>
+            <option value="eos" {% if device.platform == 'eos' %}selected{% endif %}>EOS</option>
+            <option value="generic" {% if device.platform == 'generic' %}selected{% endif %}>Generic</option>
+        </select>
+    </div>
+    
+    <button type="submit" class="btn btn-success">Update Device</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

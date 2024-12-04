@@ -1,0 +1,9 @@
+router rip
+version 2
+
+{% for network in rip.rip_networks %}
+ network {{ network }}
+{% endfor %}
+ no auto-summary
+
+

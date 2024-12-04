@@ -1,0 +1,73 @@
+-- Table: public.device
+
+-- DROP TABLE IF EXISTS public.device;
+
+CREATE TABLE IF NOT EXISTS public.device
+(
+    id integer NOT NULL DEFAULT nextval('device_id_seq'::regclass),
+    hostname character varying(100) COLLATE pg_catalog."default",
+    model character varying(50) COLLATE pg_catalog."default",
+    brand character varying(50) COLLATE pg_catalog."default",
+    connection_port integer DEFAULT 22,
+    protocol character varying(10) COLLATE pg_catalog."default" DEFAULT 'SSH'::character varying,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    platform character varying(50) COLLATE pg_catalog."default" NOT NULL DEFAULT 'generic'::character varying,
+    name character varying(100) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying,
+    CONSTRAINT device_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.device
+    OWNER to postgres;
+
+-- Protocol Table
+
+-- Table: public.routing_protocol
+
+-- DROP TABLE IF EXISTS public.routing_protocol;
+
+CREATE TABLE IF NOT EXISTS public.routing_protocol
+(
+    id integer NOT NULL DEFAULT nextval('routing_protocol_id_seq'::regclass),
+    device_id integer NOT NULL,
+    protocol character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    config_data json NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT routing_protocol_pkey PRIMARY KEY (id),
+    CONSTRAINT routing_protocol_device_id_fkey FOREIGN KEY (device_id)
+        REFERENCES public.device (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.routing_protocol
+    OWNER to postgres;
+
+-- Device Credentials Table
+
+-- Table: public.device_credentials
+
+-- DROP TABLE IF EXISTS public.device_credentials;
+
+CREATE TABLE IF NOT EXISTS public.device_credentials
+(
+    id integer NOT NULL DEFAULT nextval('device_credentials_id_seq'::regclass),
+    device_id integer NOT NULL,
+    username character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    password text COLLATE pg_catalog."default" NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT device_credentials_pkey PRIMARY KEY (id),
+    CONSTRAINT device_credentials_device_id_fkey FOREIGN KEY (device_id)
+        REFERENCES public.device (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.device_credentials
+    OWNER to postgres;

@@ -1,0 +1,7 @@
+router eigrp {{ eigrp.eigrp_as_number }}
+
+{% for network in eigrp.eigrp_networks %}
+ network {{ network }}
+{% endfor %}
+ no auto-summary
+
