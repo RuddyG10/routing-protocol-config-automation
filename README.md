@@ -1,6 +1,3 @@
-Aquí tienes un archivo `README.md` para documentar tu proyecto:
-
----
 
 # **Automatización de Redes**
 
